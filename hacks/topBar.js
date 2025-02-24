@@ -34,7 +34,7 @@ function drawHacksButton(){
     rectMode(CENTER);
     rect(topBarX/2,25,100,35,5,5,5,5);
     if(mouseIsPressed){
-      window.location.href = 'https://www.google.com';
+      window.location.href = 'https://cyberking4554.github.io';
     }
   }
   textAlign(CENTER);
@@ -50,7 +50,7 @@ function drawAboutMeButton(){
     rectMode(CENTER);
     rect((topBarX/2)-110,25,100,35,5,5,5,5);
     if(mouseIsPressed){
-      window.location.href = 'https://www.google.com';
+      window.location.href = 'https://cyberking4554.github.io/aboutMe/';
     }
   }
   textAlign(CENTER);
@@ -66,7 +66,7 @@ function drawMyProgramsButton(){
     rectMode(CENTER);
     rect((topBarX/2)+124,25,130,35,5,5,5,5);
     if(mouseIsPressed){
-      window.location.href = 'https://www.google.com';
+      window.location.href = 'https://cyberking4554.github.io/programs/';
     }
   }
   textAlign(CENTER);
@@ -82,7 +82,7 @@ function drawDesignImagesButton(){
     rectMode(CENTER);
     rect((topBarX/2)+250,25,80,35,5,5,5,5);
     if(mouseIsPressed){
-      window.location.href = 'https://www.google.com';
+      window.location.href = 'https://cyberking4554.github.io/gallery/';
     }
   }
   textAlign(CENTER);
@@ -148,7 +148,7 @@ function drawSidebarButtons(){
     rectMode(CENTER);
     rect((animationState*4)-100,100,100,35,5,5,5,5);
     if(mouseIsPressed){
-      window.location.href = 'https://www.google.com'; // PUT PAGE WEBSITE HERE!
+      window.location.href = 'https://cyberking4554.github.io'; // PUT PAGE WEBSITE HERE!
     }
   }
   textAlign(CENTER);
@@ -162,7 +162,7 @@ function drawSidebarButtons(){
     rectMode(CENTER);
     rect((animationState*4)-100,150,100,35,5,5,5,5);
     if(mouseIsPressed){
-      window.location.href= 'https://www.google.com';
+      window.location.href= 'https://cyberking4554.github.io/aboutMe/';
     }
   }
   textAlign(CENTER);
@@ -176,7 +176,7 @@ function drawSidebarButtons(){
     rectMode(CENTER);
     rect((animationState*4)-100,200,130,35,5,5,5,5);
     if(mouseIsPressed){
-      window.location.href= 'https://www.google.com';
+      window.location.href= 'https://cyberking4554.github.io/programs/';
     }
   }
   textAlign(CENTER);
@@ -190,7 +190,7 @@ function drawSidebarButtons(){
     rectMode(CENTER);
     rect((animationState*4)-100,250,80,35,5,5,5,5);
     if(mouseIsPressed){
-      window.location.href= 'https://www.google.com'
+      window.location.href= 'https://cyberking4554.github.io/gallery/';
     }
   }
   textAlign(CENTER);
