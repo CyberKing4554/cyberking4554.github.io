@@ -9,11 +9,11 @@ function setup(){
   createCanvas(windowWidth,1500);
   topBarX = width;
   topBarX -= 140;
-  font2 = loadFont('cyberking4554.github.io/programs/assets/font2.ttf');
-  turretSerialImg = loadImage('cyberking4554.github.io/programs/assets/Turret.jpg');
-  dominoSerialImg = loadImage("cyberking4554.github.io/programs/assets/dom.jpg");
-  jumpixelImg = loadImage('cyberking4554.github.io/programs/assets/jumpixel.png');
-  font1 = loadFont('cyberking4554.github.io/programs/assets/font1.ttf');
+  font2 = loadFont('./assets/font2.ttf');
+  turretSerialImg = loadImage('./assets/Turret.jpg');
+  dominoSerialImg = loadImage("./assets/dom.jpg");
+  jumpixelImg = loadImage('./assets/jumpixel.png');
+  font1 = loadFont('./assets/font1.ttf');
 }
 
 function draw(){
