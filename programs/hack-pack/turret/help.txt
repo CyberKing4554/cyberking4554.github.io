@@ -1,0 +1,33 @@
+async function connectToSerialPort() {
+    try {
+        // Step 1: Request the serial port
+        const port = await navigator.serial.requestPort();
+        
+        // Step 2: Open the port with a baud rate of 9600
+        await port.open({ baudRate: 9600 });
+        console.log("Port is open and ready!");
+
+        // Step 3: Write data to the serial port
+        const writer = port.writable.getWriter();
+        const encoder = new TextEncoder();
+        const encodedData = encoder.encode("Hello, device!");  // Convert text to bytes
+        await writer.write(encodedData);
+        console.log("Data written: Hello, device!");
+
+        // Step 4: Read data from the serial port
+        const reader = port.readable.getReader();
+        const decoder = new TextDecoder();
+        const { value, done } = await reader.read();
+        if (!done) {
+            console.log("Data received:", decoder.decode(value));
+        }
+
+        // Step 5: Close the port
+        await port.close();
+        console.log("Port closed.");
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+
+connectToSerialPort();  // Run the function
