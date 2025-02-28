@@ -56,11 +56,11 @@ function setup() {
   
   //------------------------------------------------------------
   single = new Button('imageWithBorder',CENTER, width-50, height/2+70,40,40);
-  single.selectImage(loadImage('/assets/single.png'));
+  single.selectImage(loadImage('assets/single.png'));
   single.borderSettings(true,'rgb(87,87,87)',5,'rgb(175,175,175)', false, 10);
   
   all = new Button ('imageWithBorder', CENTER, width-190, height/2+70,40,40);
-  all.selectImage(loadImage('/assets/all.png'));
+  all.selectImage(loadImage('assets/all.png'));
   all.borderSettings(true,'rgb(87,87,87)',5,'rgb(175,175,175)', false, 10);
 }
 
