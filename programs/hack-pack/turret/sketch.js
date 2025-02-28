@@ -1,4 +1,6 @@
 let font2;
+let single;
+let all;
 let backButton;
 let leftArrow;
 let rightArrow;
@@ -51,6 +53,15 @@ function setup() {
   speed2.textInit("2");
   speed2.textSettings(false,0,10,'black',font2,30,30);
   speed2.borderSettings(true,'rgb(87,87,87)',5,'rgb(175,175,175)', false, 10);
+  
+  //------------------------------------------------------------
+  single = new Button('imageWithBorder',CENTER, width-50, height/2+70,40,40);
+  single.selectImage(loadImage('/assets/single.png'));
+  single.borderSettings(true,'rgb(87,87,87)',5,'rgb(175,175,175)', false, 10);
+  
+  all = new Button ('imageWithBorder', CENTER, width-190, height/2+70,40,40);
+  all.selectImage(loadImage('/assets/all.png'));
+  all.borderSettings(true,'rgb(87,87,87)',5,'rgb(175,175,175)', false, 10);
 }
 
 function draw() {
@@ -63,6 +74,8 @@ function draw() {
   connectButton.tick();
   speed1.tick();
   speed2.tick();
+  single.tick();
+  all.tick();
   analizeStates();
   runSerial();
   
@@ -96,7 +109,11 @@ function analizeStates(){
     toSend = 'n';
   } else if (speed2.buttonClicked()) {
     toSend = 'm';
-  } else {
+  } else if (single.buttonClicked()){
+    toSend = 'f';
+  } else if (all.buttonClicked()){
+    toSend = 'a';
+  }else {
     a = true;
   }
   
@@ -113,6 +130,10 @@ function analizeStates(){
       toSend = 'n';
     } else if (key == '2'){
       toSend = 'm';
+    } else if (key == 'o' || key == 'z'){
+      toSend = 'f';
+    } else if (key == 'p' || key == 'x'){
+      toSend = 'a';
     }
   } else {
     b= true;

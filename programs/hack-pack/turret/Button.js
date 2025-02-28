@@ -13,7 +13,7 @@ class Button {
       mode == "textWithBorder" ||
       mode == "arrowWithBorder" ||
       mode == "arrowNoBorder" ||
-      mode == "image"
+      mode == "imageWithBorder" || mode == 'imageNoBorder'
     ) {
       this.mode = mode;
     }
@@ -53,7 +53,11 @@ class Button {
         this.drawArrow();
       } else if (this.mode == "arrowNoBorder") {
         this.drawArrow();
-      } else if (this.mode == "image") {
+      } else if (this.mode == "imageNoBorder") {
+        this.drawImage();
+      } else if (this.mode == "imageWithBorder"){
+        this.drawBorder();
+        this.drawImage();
       }
     }
   }
@@ -251,10 +255,9 @@ class Button {
   }
   drawImage() {
     imageMode(this.rectangleMode);
-    if (this.rectangleMode == CENTER){
-      image(this.x,this.y,this.buttonWidth,this.buttonHeight);
+    if (this.rectangleMode == CENTER){ image(this.buttonImage,this.x,this.y,this.buttonWidth,this.buttonHeight);
     } else {
-      image(this.x,this.y,this.buttonWidth,this.buttonHeight);
+      image(this.buttonImage, this.x,this.y,this.buttonWidth,this.buttonHeight);
     }
   }
 }
