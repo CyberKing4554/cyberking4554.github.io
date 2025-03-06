@@ -12,6 +12,15 @@ let lastSend = 's';
 let speed1;
 let speed2;
 let port;
+let notConnected = true;
+let additonSeclector;
+let additionMode = 0;
+let setAdditionMode = 0;
+let currentAddition = 'No Addions';
+let pollingRate = 100;
+let previousPollRate = 100;
+let pollingRateSelector;
+let applyChangesButton;
 //readSerial();
 //
 function setup() {
@@ -62,6 +71,20 @@ function setup() {
   all = new Button ('imageWithBorder', CENTER, width-190, height/2+70,40,40);
   all.selectImage(loadImage('assets/all.png'));
   all.borderSettings(true,'rgb(87,87,87)',5,'rgb(175,175,175)', false, 10);
+//--------------------------------------------------------------//
+  applyChangesButton = new Button('textWithBorder',CENTER, width-50, height-120,80,35);
+  applyChangesButton.textInit("Apply");
+  applyChangesButton.textSettings(false,0,5,'green',font2,25,26);
+  applyChangesButton.borderSettings(true,'#575757',5,'#AFAFAF', false, 10);
+  
+  additionSelector = createSelect();
+  additionSelector.position(width-325,height/2+100);
+  additionSelector.option("No Additions");
+  additionSelector.option("HC-SR04 Distance Display");
+  additionSelector.option("HC-SR04 Radar");
+  pollingRateSelector = createSlider(50,5000,100,50);
+  pollingRateSelector.position(50,height/2+120);
+  pollingRateSelector.size(width-150);
 }
 
 function draw() {
@@ -71,14 +94,21 @@ function draw() {
   upArrow.tick();
   rightArrow.tick();
   downArrow.tick();
-  connectButton.tick();
   speed1.tick();
   speed2.tick();
   single.tick();
   all.tick();
+  applyChangesButton.tick();
+  connectButton.tick();
   analizeStates();
   runSerial();
-  
+  handleExtenstionChange();
+  rectMode(CORNER);
+  textAlign(RIGHT);
+  textSize(20);
+  fill(0);
+  noStroke();
+  text("Polling Delay: "+pollingRateSelector.value(),225,height/1.55)
   
   
   if(backButton.buttonClicked()){
@@ -91,7 +121,19 @@ function draw() {
 
 function windowResized(){
   resizeCanvas(windowWidth,windowHeight);
-  leftArrow.y = height/2;
+  leftArrow.x = width-190;
+  upArrow.x = width-120;
+  rightArrow.x = width-50;
+  downArrow.x = width-120;
+  speed1.x = width-190;
+  speed2.x = width-50;
+  single.x = width-50;
+  all.x = width-190;
+  connectButton.x = width-60;
+  applyChangesButton.x = width-50;
+  additionSelector.position(width-325,height/2+100);
+  pollingRateSelector.position(50,height/2+120);
+  pollingRateSelector.size(width-150);
 }
 
 function analizeStates(){
@@ -141,38 +183,71 @@ function analizeStates(){
   if( a == true && b  == true){
     toSend = 's';
   }
+  
+  if (pollingRate != pollingRateSelector.value() || setAdditionMode != additionMode){
+    applyChangesButton.textFillColor = 'red';
+  } else {
+    applyChangesButton.textFillColor = 'green';
+  }
+
 }
 
 async function connectToSerial(){
   try {
-    port = await navigator.serial.requestPort();
-    await port.open({ baudRate: 9600});
-    connectButton.borderSettings(true,200,5,'green',false, 10);
-    connectButton.textInit("Connected");
-    connectButton.buttonWidth += 20;
-  } catch (error){
-    if(connectButton.borderColor == 'green'){
-      connectButton.borderSettings(true,200,5,'red',false, 10);
-    } else {
+    if (notConnected){
+      notConnected = false;
+      port = await navigator.serial.requestPort();
+      await port.open({ baudRate: 9600});
+      notConnected = false;
       connectButton.borderSettings(true,200,5,'green',false, 10);
+      connectButton.textInit("Connected");
+      connectButton.buttonWidth += 20;
+      
     }
+  } catch (error){
+    connectButton.borderFillColor = 'red';
+    connectButton.x = width/2;
+    connectButton.y = height/2;
+    connectButton.textInit(error + "\n please reload page and try again. \n If the error persists please contact at 1234");
+    connectButton.buttonWidth = width;
+    connectButton.buttonHeight = height/4;
   }
 }
 
 async function runSerial(){
-  if (typeof port !== 'undefined' || typeof port !== null){
-    if (toSend != lastSend){
-      lastSend = toSend;
-      const writer = port.writable.getWriter();
-      const encoder = new TextEncoder();
-      const encodedData = encoder.encode(toSend + ",");
-      console.log(toSend+',');
-      await writer.write(encodedData);
-      connectButton.borderSettings(true,'yellow',5,'green',false, 10);
-      writer.releaseLock();
-    } else {
-      connectButton.borderSettings(true,200,5,'green',false, 10);
+  if (notConnected == false){
+    if (typeof port !== 'undefined' || typeof port !== null){
+      if (toSend != lastSend){
+        lastSend = toSend;
+        const writer = port.writable.getWriter();
+        const encoder = new TextEncoder();
+      
+        if(toSend != 'p'){
+          const encodedData = encoder.encode(toSend + ",");
+          console.log(toSend+',');
+        } else {
+          const encodedData = encoder.encode(toSend+"," + pollingRate);
+        }
+        await writer.write(encodedData);
+        connectButton.borderSettings(true,'yellow',5,'green',false, 10);
+        writer.releaseLock();
+      } else {
+        connectButton.borderSettings(true,200,5,'green',false, 10);
+      }
     }
   }
-  
+}
+
+function handleExtenstionChange(){
+  currentAddition = additionSelector.value();
+  if (currentAddition == 'HC-SR04 Distance Display'){
+    additionMode = 1;
+  } else if (currentAddition == 'No Additions'){
+    additionMode = 0;
+  } else if (currentAddition == 'HC-SR04 Radar'){
+    additionMode = 2;
+  }
+  if(applyChangesButton.buttonClicked() && applyChangesButton.textFillColor != 'green'){
+  //  console.log("wow");
+  }
 }
