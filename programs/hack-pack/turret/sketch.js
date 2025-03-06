@@ -91,7 +91,7 @@ function draw() {
 
 function windowResized(){
   resizeCanvas(windowWidth,windowHeight);
-  leftArrow.y = height/2;
+//  leftArrow.y = height/2;
 }
 
 function analizeStates(){
