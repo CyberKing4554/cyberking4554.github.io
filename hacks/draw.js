@@ -10,8 +10,8 @@ function setup(){
   font2 = loadFont('assets/font2.ttf');
   topBarX = width;
   topBarX -= 140;
-  crane = loadImage('assets/crane.png');
-  construction = loadImage('assets/construction.png');
+//  crane = loadImage('assets/crane.png');
+//  construction = loadImage('assets/construction.png');
 }
 function draw(){
   background(255);

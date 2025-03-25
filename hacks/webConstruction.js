@@ -1,6 +1,6 @@
 function underConstructionSign(){
-  image(crane,width/2-100,255,200,200);
-  image(construction,width/2-125,34,250,250);
+  //image(crane,width/2-100,255,200,200);
+  //image(construction,width/2-125,34,250,250);
   noStroke();
   fill(0);
   textAlign(CENTER);
