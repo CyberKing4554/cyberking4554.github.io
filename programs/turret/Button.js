@@ -84,6 +84,8 @@ class Button {
         ) {
           result = true;
           return result;
+        } else {
+          return false;
         }
       }
     }

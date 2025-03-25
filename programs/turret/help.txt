@@ -21,7 +21,7 @@ async function connectToSerialPort() {
         if (!done) {
             console.log("Data received:", decoder.decode(value));
         }
-
+        
         // Step 5: Close the port
         await port.close();
         console.log("Port closed.");
