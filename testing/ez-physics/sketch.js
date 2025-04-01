@@ -41,7 +41,7 @@ function setup() {
 }
 
 function draw() {
-  engine.world.gravity.y = -0.01;
+  engine.world.gravity.y = 1;
   background(200);
     frames ++;
   if(second() != previousSecond){
