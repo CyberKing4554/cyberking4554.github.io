@@ -526,7 +526,7 @@ function drawFooter(s) {
   textSize(min(12, width * 0.033));
 
   text(
-    "THANK YOU FOR BEING PART OF FIGHT MONTH",
+    "",
     width / 2,
     s.footerY,
     width - s.pad * 2,
