@@ -271,7 +271,7 @@ function drawHeader() {
   fill("#C5CEE9");
   textStyle(NORMAL);
   textSize(min(14, width * 0.038));
-  text("Together, we can make a difference.", cx, 158);
+  text("", cx, 158);
 }
 
 // ===== FUNDRAISING JAR =====
