@@ -7,7 +7,7 @@
 */
 
 // ===== FUNDRAISING SETTINGS =====
-let amountRaised = 0;
+let amountRaised = 2800;
 let fundraisingGoal = 5000;
 
 let goals = [
