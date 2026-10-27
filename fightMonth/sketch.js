@@ -1,21 +1,21 @@
 
 /*
-  FIGHT MONTH — Cancer Fundraiser
-  Designed for p5.js 2.3.4
-  Mobile-friendly, animated, and easy to customize.
+  FIGHT MONTH — Responsive Cancer Fundraiser
+  p5.js 2.3.4
+
+  Responsive for phones, tablets, laptops, and desktops.
 */
 
 // ===== FUNDRAISING SETTINGS =====
 let amountRaised = 0;
 let fundraisingGoal = 5000;
 
-// Edit the amounts and descriptions to match your fundraiser.
 let goals = [
   {
     amount: 1800,
     icon: "🎀",
     title: "Temporary Dye",
-    description: "A group of student volenteers temporarily dyes their hair.",
+    description: "Student volunteers temporarily dye their hair.",
     color: "#F47AA8"
   },
   {
@@ -29,50 +29,127 @@ let goals = [
     amount: 2800,
     icon: "❤️‍🩹",
     title: "Buzz + Hair Dye",
-    description: "Student volunteers buzzes and dyes their hair.",
-    color: "#ffffff"
+    description: "Student volunteers buzz and dye their hair.",
+    color: "#FFFFFF"
   },
   {
     amount: 5000,
     icon: "🎗",
     title: "Staff Buzz/Dye",
-    description: "Staff volunteers buzzes and/or dyes hair.",
+    description: "Staff volunteers buzz and/or dye their hair.",
     color: "#FFD166"
   }
 ];
 
+// ===== DESIGN SETTINGS =====
+const MAX_WIDTH = 900;
+const MIN_WIDTH = 280;
+
 let particles = [];
 let moneyPieces = [];
 let animationProgress = 0;
-let lastRaised = -1;
-let canvasWidth = 700;
-let canvasHeight = 1160;
+let fightMonthCanvas;
 
+// ===== SETUP =====
 function setup() {
-  
   pixelDensity(min(window.devicePixelRatio || 1, 2));
 
-  let w = min(windowWidth, 700);
-  createCanvas(w, w * canvasHeight / canvasWidth);
-  //console.log(width/2);
   textFont("sans-serif");
   textAlign(CENTER, CENTER);
 
-  for (let i = 0; i < 30; i++) {
+  createResponsiveCanvas();
+  initializeParticles();
+  initializeMoney();
+}
+
+// ===== RESPONSIVE CANVAS =====
+function createResponsiveCanvas() {
+  let w = constrain(windowWidth, MIN_WIDTH, MAX_WIDTH);
+  let h = calculateHeight(w);
+
+  if (!fightMonthCanvas) {
+    // Create the canvas and retain its reference.
+    fightMonthCanvas = createCanvas(w, h);
+
+    fightMonthCanvas.elt.style.display = "block";
+    fightMonthCanvas.elt.style.maxWidth = "100%";
+    fightMonthCanvas.elt.style.height = "auto";
+    fightMonthCanvas.elt.style.margin = "0 auto";
+  } else {
+    // resizeCanvas returns no canvas element.
+    resizeCanvas(w, h);
+  }
+}
+
+// ===== RESPONSIVE LAYOUT =====
+function calculateHeight(w) {
+  return getLayout(w).totalHeight;
+}
+
+function getLayout(w = width) {
+  let pad = max(16, w * 0.055);
+
+  let jarW = min(260, max(175, w * 0.40));
+  let jarH = jarW * 1.38;
+  let jarX = (w - jarW) / 2;
+  let jarY = 176;
+  let jarBottom = jarY + jarH;
+
+  let metricY = jarBottom + 80;
+  let barX = pad + 15;
+  let barW = max(30, w - barX * 2);
+
+  let goalsTitleY = metricY + 180;
+  let cardStartY = goalsTitleY + 30;
+
+  let cardH = w < 430 ? 104 : 86;
+  let gap = 10;
+
+  let footerY =
+    cardStartY + goals.length * (cardH + gap) - gap + 40;
+
+  return {
+    w,
+    pad,
+    jarW,
+    jarH,
+    jarX,
+    jarY,
+    jarBottom,
+    metricY,
+    barX,
+    barW,
+    goalsTitleY,
+    cardStartY,
+    cardH,
+    gap,
+    footerY,
+    totalHeight: footerY + 35
+  };
+}
+
+// ===== INITIALIZE PARTICLES =====
+function initializeParticles() {
+  particles = [];
+
+  for (let i = 0; i < 35; i++) {
     particles.push({
-      x: random(700),
-      y: random(1160),
+      x: random(width),
+      y: random(height),
       size: random(2, 5),
       speed: random(0.3, 1.1),
       phase: random(TWO_PI)
     });
   }
+}
+
+function initializeMoney() {
+  moneyPieces = [];
 
   for (let i = 0; i < 16; i++) {
     moneyPieces.push({
-      x: random(35, 665),
-      y: random(120, 570),
-      rotation: random(TWO_PI),
+      x: random(20, max(21, width - 20)),
+      y: random(180, 600),
       speed: random(0.003, 0.012),
       size: random(0.7, 1.15),
       phase: random(TWO_PI)
@@ -80,56 +157,73 @@ function setup() {
   }
 }
 
+// ===== MAIN DRAW LOOP =====
 function draw() {
-  let s = width / 700;
   animationProgress = min(animationProgress + 0.025, 1);
 
-  push();
-  scale(s);
+  let layout = getLayout();
+
+  // Keep the canvas height synchronized with the layout.
+  if (height !== layout.totalHeight) {
+    resizeCanvas(width, layout.totalHeight);
+  }
 
   drawBackground();
   drawDecorations();
   drawHeader();
-  drawJar();
-  drawRaisedAmount();
-  drawGoals();
-  drawFooter();
-
-  pop();
+  drawJar(layout);
+  drawRaisedAmount(layout);
+  drawGoals(layout);
+  drawFooter(layout);
 }
 
+// ===== BACKGROUND =====
 function drawBackground() {
-  background("#0a2140");
+  background("#0A2140");
 
-  // Soft glowing circles
   noStroke();
-  for (let i = 0; i < 5; i++) {
-    let x = [70, 620, 570, 100, 350][i];
-    let y = [210, 350, 760, 900, 1050][i];
-    let d = 120 + sin(frameCount * 0.02 + i) * 15;
 
-    fill(75, 92, 180, 12);
+  let positions = [
+    [0.10, 0.19],
+    [0.88, 0.30],
+    [0.82, 0.65],
+    [0.12, 0.79],
+    [0.50, 0.91]
+  ];
+
+  for (let i = 0; i < positions.length; i++) {
+    let x = positions[i][0] * width;
+    let y = positions[i][1] * height;
+    let d = min(140, width * 0.24) +
+      sin(frameCount * 0.02 + i) * 12;
+
+    fill(75, 92, 180, 15);
     circle(x, y, d);
   }
 
-  // Subtle stars
   for (let p of particles) {
-    let twinkle = 0.3 + abs(sin(frameCount * 0.025 + p.phase)) * 0.7;
+    let twinkle =
+      0.3 + abs(sin(frameCount * 0.025 + p.phase)) * 0.7;
+
     fill(210, 225, 255, 100 * twinkle);
     circle(p.x, p.y, p.size);
+
     p.y -= p.speed;
 
     if (p.y < -5) {
-      p.y = 1165;
-      p.x = random(700);
+      p.y = height + 5;
+      p.x = random(width);
+    }
+
+    if (p.x > width) {
+      p.x = random(width);
     }
   }
 }
 
+// ===== FLOATING MONEY =====
 function drawDecorations() {
-  // Floating banknotes behind the jar
-  for (let i = 0; i < moneyPieces.length; i++) {
-    let m = moneyPieces[i];
+  for (let m of moneyPieces) {
     let x = m.x + sin(frameCount * 0.018 + m.phase) * 10;
     let y = m.y + sin(frameCount * 0.025 + m.phase) * 9;
 
@@ -146,79 +240,93 @@ function drawDecorations() {
     noStroke();
     fill(100, 230, 190, 65);
     circle(0, 0, 12);
+
     pop();
   }
 }
 
+// ===== HEADER =====
 function drawHeader() {
-  // Small event label
+  let cx = width / 2;
+
   noStroke();
   fill("#25345D");
-  rect(291, 28, 120, 30, 15);
+  rect(cx - 64, 27, 128, 30, 15);
 
   fill("#BFD0FF");
-  textSize(12);
   textStyle(BOLD);
-  text("SMÍDUM ÁGÆTI", 350, 43);
+  textSize(11);
+  text("VIKINGS • COMMUNITY", cx, 42);
 
-  // Main title
   fill("#FFFFFF");
-  textSize(80);
-  textStyle(BOLD);
-  text("FIGHT MONTH", 350, 104);
 
-  // Accent line
-  noStroke();
+  let titleSize = min(80, width * 0.105);
+  textSize(titleSize);
+  textStyle(BOLD);
+  text("FIGHT MONTH", cx, 101);
+
   fill("#FF77A8");
-  rect(300, 146, 100, 4, 2);
+  rect(cx - 50, 139, 100, 4, 2);
+
+  fill("#C5CEE9");
+  textStyle(NORMAL);
+  textSize(min(14, width * 0.038));
+  text("Together, we can make a difference.", cx, 158);
 }
 
-function drawJar() {
-  let jarX = 220;
-  let jarY = 205;
-  let jarW = 260;
-  let jarH = 360;
-  let jarBottom = jarY + jarH;
+// ===== FUNDRAISING JAR =====
+function drawJar(s) {
+  let x = s.jarX;
+  let y = s.jarY;
+  let jarW = s.jarW;
+  let jarH = s.jarH;
+  let bottom = s.jarBottom;
+  let cx = width / 2;
 
   // Jar shadow
   noStroke();
   fill(0, 0, 0, 65);
-  ellipse(350, jarBottom + 10, 285, 28);
+  ellipse(cx, bottom + 9, jarW + 25, 25);
 
-  // Jar fill level
-  let rawProgress = constrain(amountRaised / fundraisingGoal, 0, 1);
-  let fillProgress = rawProgress * animationProgress;
-  let fillHeight = (jarH - 35) * fillProgress;
-  let fillY = jarBottom - fillHeight;
+  // Donation fill level
+  let progress = constrain(amountRaised / fundraisingGoal, 0, 1);
+  let fillHeight = (jarH - 35) * progress * animationProgress;
+  let fillY = bottom - fillHeight;
 
-  // Colored liquid / donation fill
+  // CHANGE LIQUID COLOR HERE:
+  // RGB values are followed by transparency (0-255).
   noStroke();
-  fill(178, 161, 105, 40);
-  rect(jarX + 9, fillY, jarW - 18, fillHeight, 8);
+  fill(178, 161, 105, 145);
+  rect(x + 8, fillY, jarW - 16, fillHeight, 8);
 
-  // Rounded-looking top of the fill using circles
+  // Animated liquid surface
   if (fillHeight > 4) {
-    fill(188, 171, 115, 70);
-    for (let x = jarX + 18; x < jarX + jarW - 18; x += 18) {
-      let wave = sin(frameCount * 0.055 + x * 0.04) * 3;
-      circle(x, fillY + wave, 12);
+    fill(220, 200, 140, 165);
+
+    for (let px = x + 18; px < x + jarW - 18; px += 18) {
+      let wave = sin(frameCount * 0.055 + px * 0.04) * 3;
+      circle(px, fillY + wave, 12);
     }
   }
 
-  // Floating coins inside jar
+  // Floating coins
   for (let i = 0; i < 9; i++) {
-    let coinX = jarX + 28 + ((i * 29) % (jarW - 55));
-    let coinBaseY = jarBottom - 25 -
+    let coinX = x + 28 + ((i * 29) % (jarW - 55));
+
+    let coinBaseY = bottom - 25 -
       ((i * 37) % max(40, fillHeight + 1));
 
     if (coinBaseY > fillY - 10 && fillHeight > 18) {
       let coinY = coinBaseY + sin(frameCount * 0.04 + i) * 4;
+
       fill("#FFD166");
       stroke(255, 238, 180);
       strokeWeight(1);
       circle(coinX, coinY, 13);
+
       noStroke();
       fill("#A76B25");
+      textStyle(BOLD);
       textSize(9);
       text("$", coinX, coinY);
     }
@@ -226,105 +334,126 @@ function drawJar() {
 
   // Glass body
   noFill();
-  stroke(179, 207, 255, 200);
+  stroke(179, 207, 255, 210);
   strokeWeight(4);
-  rect(jarX, jarY, jarW, jarH, 24);
+  rect(x, y, jarW, jarH, 24);
 
   // Glass highlights
   stroke(255, 255, 255, 95);
   strokeWeight(5);
-  line(jarX + 20, jarY + 35, jarX + 20, jarBottom - 35);
+  line(x + 20, y + 35, x + 20, bottom - 35);
+
   stroke(255, 255, 255, 50);
   strokeWeight(2);
-  line(jarX + jarW - 20, jarY + 50,
-       jarX + jarW - 20, jarBottom - 55);
+  line(
+    x + jarW - 20,
+    y + 50,
+    x + jarW - 20,
+    bottom - 55
+  );
 
-  // Jar lid
+  // Lid
   noStroke();
   fill("#FF77A8");
-  rect(jarX - 10, jarY - 12, jarW + 20, 30, 8);
+  rect(x - 10, y - 12, jarW + 20, 30, 8);
 
   fill("#FFAAC7");
-  rect(jarX + 3, jarY - 8, jarW - 6, 6, 3);
+  rect(x + 3, y - 8, jarW - 6, 6, 3);
 
   // Jar label
+  let labelW = jarW * 0.77;
+  let labelH = 100;
+  let labelX = cx - labelW / 2;
+  let labelY = y + jarH * 0.32;
+
   fill(11, 16, 36, 225);
-  rect(jarX + 30, jarY + 110, jarW - 60, 100, 15);
+  rect(labelX, labelY, labelW, labelH, 15);
 
   fill("#FFFFFF");
-  textSize(18);
   textStyle(BOLD);
-  text("VIKINGS FIGHT", 350, jarY + 139);
-  text("CANCER", 350, jarY + 163);
+  textSize(min(18, jarW * 0.075));
+  text("VIKINGS FIGHT", cx, labelY + 29);
+  text("CANCER", cx, labelY + 53);
 
   fill("#FFAAC7");
-  textSize(12);
   textStyle(NORMAL);
-  text("ONE DONATION AT A TIME", 350, jarY + 188);
+  textSize(min(11, jarW * 0.045));
+  text("ONE DONATION AT A TIME", cx, labelY + 77);
 
-  // Jar progress marker
+  // Percentage filled
   fill("#FFFFFF");
-  textSize(13);
   textStyle(BOLD);
-  text(round(rawProgress * 100) + "% FILLED", 350, jarBottom + 30);
+  textSize(13);
+  text(round(progress * 100) + "% FILLED", cx, bottom + 29);
 }
 
-function drawRaisedAmount() {
-  let y = 625;
+// ===== FUNDRAISING TOTAL =====
+function drawRaisedAmount(s) {
+  let y = s.metricY;
+  let cx = width / 2;
 
   fill("#9EABC9");
-  textSize(14);
+  textSize(min(14, width * 0.04));
   textStyle(BOLD);
-  text("TOTAL RAISED SO FAR", 350, y);
+  text("TOTAL RAISED SO FAR", cx, y);
 
   fill("#FFFFFF");
-  textSize(42);
+  textSize(min(44, width * 0.12));
   textStyle(BOLD);
-  text(formatMoney(amountRaised), 350, y + 48);
+  text(formatMoney(amountRaised), cx, y + 43);
 
   fill("#9EABC9");
   textSize(15);
   textStyle(NORMAL);
-  text("of " + formatMoney(fundraisingGoal) + " goal", 350, y + 80);
+  text("of " + formatMoney(fundraisingGoal) + " goal", cx, y + 77);
 
   // Progress bar background
   noStroke();
   fill("#273252");
-  rect(100, y + 105, 500, 13, 7);
+  rect(s.barX, y + 100, s.barW, 13, 7);
 
-  // Animated progress bar
   let progress = constrain(amountRaised / fundraisingGoal, 0, 1);
-  let barW = 500 * progress * animationProgress;
+  let barW = s.barW * progress * animationProgress;
 
   if (barW > 0) {
     fill("#FF77A8");
-    rect(100, y + 105, barW, 13, 7);
+    rect(s.barX, y + 100, barW, 13, 7);
 
     fill("#FFD166");
-    circle(100 + barW, y + 111.5, 13);
+    circle(s.barX + barW, y + 106.5, 13);
   }
 
+
+  // Donation text — centered directly beneath the progress bar
   fill("#C5CEE9");
-  textSize(12);
-  text("Donations go to a family in middleton struggling with cancer", 350, y + 132);
+  textStyle(NORMAL);
+  textSize(min(12, width * 0.033));
+  textAlign(CENTER, CENTER);
+
+  text(
+    "Every donation goes to a family in Middleton affected by cancer.",
+    width / 2,
+    y + 135
+  );
+
 }
 
-function drawGoals() {
-  let startY = 805;
-  let cardH = 68;
-  let gap = 9;
+// ===== GOAL CARDS =====
+function drawGoals(s) {
+  let cx = width / 2;
 
   fill("#FFFFFF");
-  textSize(20);
   textStyle(BOLD);
-  text("OUR 4 GOALS", width/2, 780);
+  textSize(min(22, width * 0.06));
+  text("OUR 4 GOALS", cx, s.goalsTitleY);
 
   for (let i = 0; i < goals.length; i++) {
     let g = goals[i];
-    let y = startY + i * (cardH + gap);
+    let x = s.pad;
+    let y = s.cardStartY + i * (s.cardH + s.gap);
+    let cardW = width - s.pad * 2;
+    let cardH = s.cardH;
     let reached = amountRaised >= g.amount;
-    let cardW = 560;
-    let x = 70;
 
     // Card background
     noStroke();
@@ -333,56 +462,95 @@ function drawGoals() {
 
     // Accent stripe
     fill(g.color);
-    rect(x, y + 10, 4, cardH - 20, 2);
+    rect(x, y + 12, 4, cardH - 24, 2);
 
-    // Icon circle
+    // Icon background
     fill(255, 255, 255, 15);
-    circle(x + 37, y + cardH / 2, 43);
+    circle(x + 36, y + cardH / 2, 42);
 
     fill(g.color);
+    textStyle(NORMAL);
     textSize(21);
-    text(g.icon, x + 37, y + cardH / 2 + 1);
+    text(g.icon, x + 36, y + cardH / 2 + 1);
 
-    // Goal title and description
+    // Title and description
+    let textX = x + 67;
+    let rightEdge = x + cardW - 12;
+    let textW = max(65, cardW - 165);
+
     textAlign(LEFT, CENTER);
     fill("#FFFFFF");
     textStyle(BOLD);
-    textSize(15);
-    text(g.title, x + 70, y + 21);
+    textSize(min(15, max(12, width * 0.041)));
+
+    text(
+      g.title,
+      textX,
+      y + (cardH < 95 ? 23 : 25),
+      textW,
+      24
+    );
 
     fill("#B7C3DF");
     textStyle(NORMAL);
-    textSize(10.5);
-    text(g.description, x + 70, y + 43, 365, 25);
+    textSize(width < 360 ? 10 : 11);
+
+    text(
+      g.description,
+      textX,
+      y + (cardH < 95 ? 51 : 55),
+      textW,
+      cardH < 95 ? 27 : 36
+    );
 
     // Target amount
     textAlign(RIGHT, CENTER);
     fill(g.color);
     textStyle(BOLD);
-    textSize(14);
-    text(formatMoney(g.amount), x + cardW - 15, y + 23);
+    textSize(min(14, max(11, width * 0.038)));
+    text(formatMoney(g.amount), rightEdge, y + 24);
 
-    // Status label
+    // Goal status
     fill(reached ? "#8FE0BF" : "#9EABC9");
     textSize(10);
-    text(reached ? "REACHED ✓" : "TARGET", x + cardW - 15, y + 46);
+    text(reached ? "REACHED ✓" : "TARGET", rightEdge, y + 48);
 
     textAlign(CENTER, CENTER);
   }
 }
 
-function drawFooter() {
+// ===== FOOTER =====
+function drawFooter(s) {
   fill("#8491B3");
-  textSize(12);
   textStyle(NORMAL);
-  text("THANK YOU FOR BEING PART OF FIGHT MONTH", 350, 1138);
+  textSize(min(12, width * 0.033));
+
+  text(
+    "THANK YOU FOR BEING PART OF FIGHT MONTH",
+    width / 2,
+    s.footerY,
+    width - s.pad * 2,
+    25
+  );
 }
 
+// ===== HELPER =====
 function formatMoney(amount) {
   return "$" + amount.toLocaleString("en-US");
 }
 
+// ===== WINDOW RESIZE =====
 function windowResized() {
-  let w = min(windowWidth, 700);
-  resizeCanvas(w, w * canvasHeight / canvasWidth);
+  createResponsiveCanvas();
+
+  // Keep particles inside the new canvas dimensions.
+  for (let p of particles) {
+    p.x = constrain(p.x, 0, width);
+    p.y = constrain(p.y, 0, height);
+  }
+
+  // Keep floating money within the canvas.
+  for (let m of moneyPieces) {
+    m.x = constrain(m.x, 20, max(21, width - 20));
+  }
 }
