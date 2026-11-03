@@ -1,4 +1,3 @@
-
 /*
   FIGHT MONTH — Responsive Cancer Fundraiser
   p5.js 2.3.4
@@ -7,8 +6,8 @@
 */
 
 // ===== FUNDRAISING SETTINGS =====
-let amountRaised = 0;
-let fundraisingGoal = 5000;
+let amountRaised = 578.35+208.63;
+let fundraisingGoal = 4000;
 
 let goals = [
   {
@@ -33,7 +32,7 @@ let goals = [
     color: "#FFFFFF"
   },
   {
-    amount: 5000,
+    amount: 4000,
     icon: "🎗",
     title: "Staff Buzz/Dye",
     description: "Staff volunteers buzz and/or dye their hair.",
@@ -49,6 +48,13 @@ let particles = [];
 let moneyPieces = [];
 let animationProgress = 0;
 let fightMonthCanvas;
+let logoImage;
+
+// ===== LOAD LOGO =====
+function preload() {
+  // Use "logo.png" or change this to "logo.jpg" if your file is a JPG.
+  logoImage = loadImage("logo.png");
+}
 
 // ===== SETUP =====
 function setup() {
@@ -310,11 +316,20 @@ function drawJar(s) {
   }
 
   // Floating coins
+  randomSeed(99); 
   for (let i = 0; i < 9; i++) {
-    let coinX = x + 28 + ((i * 29) % (jarW - 55));
+    /*
+    let coinX = (x + 28 + ((i * 29) % (jarW - 55)));
 
     let coinBaseY = bottom - 25 -
       ((i * 37) % max(40, fillHeight + 1));
+      */
+    let randomX = random(0, jarW - 55);
+    let randomY = random(0, max(40, fillHeight + 1));
+
+    let coinX = x + 28 + randomX;
+    let coinBaseY = bottom - 25 - randomY;
+    
 
     if (coinBaseY > fillY - 10 && fillHeight > 18) {
       let coinY = coinBaseY + sin(frameCount * 0.04 + i) * 4;
@@ -366,25 +381,29 @@ function drawJar(s) {
   let labelX = cx - labelW / 2;
   let labelY = y + jarH * 0.32;
 
-  fill(11, 16, 36, 225);
+  fill(255, 255, 255, 220);
   rect(labelX, labelY, labelW, labelH, 15);
 
-  fill("#FFFFFF");
-  textStyle(BOLD);
-  textSize(min(18, jarW * 0.075));
-  text("VIKINGS FIGHT", cx, labelY + 29);
-  text("CANCER", cx, labelY + 53);
+  // Logo image — put logo.png in the same folder as your sketch.
+  if (logoImage) {
+    let logoScale = min(
+      (labelW - 16) / logoImage.width,
+      (labelH - 16) / logoImage.height
+    );
+    let logoW = logoImage.width * logoScale;
+    let logoH = logoImage.height * logoScale;
 
-  fill("#FFAAC7");
-  textStyle(NORMAL);
-  textSize(min(11, jarW * 0.045));
-  text("ONE DONATION AT A TIME", cx, labelY + 77);
+    imageMode(CENTER);
+    image(logoImage, cx, labelY + labelH / 2, logoW, logoH);
+    imageMode(CORNER);
+  }
 
   // Percentage filled
   fill("#FFFFFF");
   textStyle(BOLD);
   textSize(13);
   text(round(progress * 100) + "% FILLED", cx, bottom + 29);
+  randomSeed(millis());
 }
 
 // ===== FUNDRAISING TOTAL =====
@@ -526,7 +545,7 @@ function drawFooter(s) {
   textSize(min(12, width * 0.033));
 
   text(
-    "",
+    "THANK YOU FOR BEING PART OF FIGHT MONTH",
     width / 2,
     s.footerY,
     width - s.pad * 2,
