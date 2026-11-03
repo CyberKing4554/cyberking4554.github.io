@@ -464,7 +464,7 @@ function drawGoals(s) {
   fill("#FFFFFF");
   textStyle(BOLD);
   textSize(min(22, width * 0.06));
-  text("OUR 4 GOALS", cx, s.goalsTitleY);
+  text("OUR GOALS:", cx, s.goalsTitleY);
 
   for (let i = 0; i < goals.length; i++) {
     let g = goals[i];
